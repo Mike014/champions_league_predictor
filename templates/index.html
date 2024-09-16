@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Goals Scored</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            input[type="submit"]:hover {
+                background-color: #218838;
+            }
+
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+        }
+
+        .predicted-goals {
+            text-align: center;
+            color: #333;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (event) {
+                let valid = true;
+                const inputs = form.querySelectorAll('input[type="text"]');
+                inputs.forEach(input => {
+                    if (input.value.trim() === '') {
+                        valid = false;
+                        input.style.borderColor = 'red';
+                    } else {
+                        input.style.borderColor = '#ccc';
+                    }
+                });
+
+                if (!valid) {
+                    event.preventDefault();
+                    alert('Please fill out all fields.');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Predict Goals Scored</h1>
+        <form method="POST">
+            <label for="M">Matches Played (M):</label>
+            <input type="text" id="M" name="M">
+            <label for="W">Wins (W):</label>
+            <input type="text" id="W" name="W">
+            <label for="D">Draws (D):</label>
+            <input type="text" id="D" name="D">
+            <label for="L">Losses (L):</label>
+            <input type="text" id="L" name="L">
+            <label for="Dif">Goal Difference (Dif):</label>
+            <input type="text" id="Dif" name="Dif">
+            <label for="Pt">Points (Pt):</label>
+            <input type="text" id="Pt" name="Pt">
+            <input type="submit" value="Predict">
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li class="error-message">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        {% if predicted_goals is not none %}
+        <h2 class="predicted-goals">Predicted Goals: {{ predicted_goals }}</h2>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+</html>
+
+
+
+
+
+
+
+
