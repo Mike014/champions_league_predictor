@@ -1,8 +1,8 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from flask import Flask, request, render_template, flash
 import numpy as np
 
@@ -23,16 +23,24 @@ y = df_performance['goals']  # Predict goals scored in a season
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
+# Polynomial Features
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X_scaled)
+
 # Split the data into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
 
 # Create and train the model
-model = LinearRegression()
+model = Ridge(alpha=1.0)  # You can also try Lasso or other models
 model.fit(X_train, y_train)
 
 # Evaluate the model
 y_pred = model.predict(X_test)
 print("Mean Squared Error:", mean_squared_error(y_test, y_pred))
+
+# Cross-Validation
+cv_scores = cross_val_score(model, X_poly, y, cv=5, scoring='neg_mean_squared_error')
+print("Cross-Validated MSE:", -cv_scores.mean())
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -53,8 +61,9 @@ def index():
 
                 # Normalize input data
                 input_data = scaler.transform(np.array([[form_data['M'], form_data['W'], form_data['D'], form_data['L'], form_data['Dif'], form_data['Pt']]]))
-                print(f"Normalized Input Data: {input_data}")
-                predicted_goals = model.predict(input_data)[0]
+                input_data_poly = poly.transform(input_data)
+                print(f"Normalized Input Data: {input_data_poly}")
+                predicted_goals = model.predict(input_data_poly)[0]
                 predicted_goals = round(predicted_goals)
 
                 # Print user input and result
