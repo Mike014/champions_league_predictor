@@ -58,31 +58,40 @@ def index():
     if request.method == 'POST':
         try:
             # Extract form data
-            form_data = {key: request.form[key] for key in ['M', 'W', 'D', 'L', 'Dif', 'Pt']}
+            form_data = {key: request.form[key] for key in ['M.', 'W', 'D', 'L', 'Dif', 'Pt.']}
+            logging.info(f"Form Data Received: {form_data}")
 
             # Ensure all fields are filled
             if all(form_data.values()):
                 # Convert form data to float
                 form_data = {key: float(value) for key, value in form_data.items()}
+                logging.info(f"Converted Form Data: {form_data}")
 
                 # Normalize input data
                 input_data = pd.DataFrame([form_data])
                 input_data_scaled = scaler.transform(input_data)
+                logging.info(f"Scaled Input Data: {input_data_scaled}")
+
                 input_data_poly = poly.transform(input_data_scaled)
-                logging.info(f"Normalized Input Data: {input_data_poly}")
+                logging.info(f"Polynomial Features Input Data: {input_data_poly}")
+
+                # Predict goals
                 predicted_goals = model.predict(input_data_poly)[0]
                 predicted_goals = round(predicted_goals)
-
-                # Print user input and result
-                logging.info(f"User Input: {form_data}")
                 logging.info(f"Predicted Goals: {predicted_goals}")
             else:
                 error_message = "Please ensure all fields are filled out correctly with numeric values."
                 flash(error_message)
-        except ValueError:
+        except ValueError as e:
             error_message = "Please ensure all fields are filled out correctly with numeric values."
+            logging.error(f"ValueError: {e}")
+            flash(error_message)
+        except Exception as e:
+            error_message = "An unexpected error occurred."
+            logging.error(f"Exception: {e}")
             flash(error_message)
 
+    logging.info(f"Rendering template with predicted_goals: {predicted_goals}")
     return render_template('index.html', predicted_goals=predicted_goals, error_message=error_message)
 
 if __name__ == '__main__':

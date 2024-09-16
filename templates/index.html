@@ -96,8 +96,8 @@
     <div class="container">
         <h1>Predict Goals Scored</h1>
         <form method="POST">
-            <label for="M">Matches Played (M):</label>
-            <input type="text" id="M" name="M">
+            <label for="M.">Matches Played (M.):</label>
+            <input type="text" id="M." name="M.">
             <label for="W">Wins (W):</label>
             <input type="text" id="W" name="W">
             <label for="D">Draws (D):</label>
@@ -106,11 +106,10 @@
             <input type="text" id="L" name="L">
             <label for="Dif">Goal Difference (Dif):</label>
             <input type="text" id="Dif" name="Dif">
-            <label for="Pt">Points (Pt):</label>
-            <input type="text" id="Pt" name="Pt">
+            <label for="Pt.">Points (Pt.):</label>
+            <input type="text" id="Pt." name="Pt.">
             <input type="submit" value="Predict">
         </form>
-
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul>
@@ -128,7 +127,6 @@
 </body>
 </html>
 
-</html>
 
 
 

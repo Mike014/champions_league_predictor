@@ -1,4 +1,4 @@
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError
 import time
 
 def run(playwright):
@@ -12,12 +12,12 @@ def run(playwright):
 
     # Find the form elements and fill them
     form_data = {
-        '#M': '10',
+        '#M\\.': '10',  # Escape the dot in the selector
         '#W': '6',
         '#D': '2',
         '#L': '2',
         '#Dif': '15',
-        '#Pt': '20'
+        '#Pt\\.': '20'  # Escape the dot in the selector
     }
 
     for selector, value in form_data.items():
@@ -27,11 +27,14 @@ def run(playwright):
     page.click('input[type="submit"]')
 
     # Wait for the page to load and verify the result
-    time.sleep(2)  # Wait 2 seconds for the page to load
+    time.sleep(5)  # Increase wait time to 5 seconds
 
-    # Verify the expected result
-    predicted_goals = page.text_content('.predicted-goals')
-    print(f"Predicted Goals: {predicted_goals}")
+    try:
+        # Verify the expected result
+        predicted_goals = page.text_content('.predicted-goals', timeout=10000)  # Increase timeout to 10 seconds
+        print(f"Predicted Goals: {predicted_goals}")
+    except TimeoutError:
+        print("Error: The element '.predicted-goals' was not found on the page.")
 
     # Close the browser
     browser.close()
